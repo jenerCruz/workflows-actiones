@@ -1,0 +1,48 @@
+# .github/workflows/create-repo.yml
+name: Crear nuevo repositorio
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo_name:
+        description: 'Nombre del nuevo repositorio'
+        required: true
+      visibility:
+        description: 'Visibilidad (public/private)'
+        required: true
+        default: 'private'
+      user_name:
+        description: 'Nombre de usuario Git'
+        required: true
+      user_email:
+        description: 'Correo electrónico Git'
+        required: true
+
+jobs:
+  crear:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configurar Git
+        run: |
+          git config --global user.name "${{ github.event.inputs.user_name }}"
+          git config --global user.email "${{ github.event.inputs.user_email }}"
+
+      - name: Crear carpeta y archivos base
+        run: |
+          mkdir ${{ github.event.inputs.repo_name }}
+          cd ${{ github.event.inputs.repo_name }}
+          echo "# ${{ github.event.inputs.repo_name }}" > README.md
+          git init
+          git add .
+          git commit -m "Repo inicializado"
+      
+      - name: Crear repo en GitHub vía API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh repo create ${{ github.repository_owner }}/${{ github.event.inputs.repo_name }} \
+            --${{ github.event.inputs.visibility }} \
+            --confirm
+          cd ${{ github.event.inputs.repo_name }}
+          git remote add origin https://github.com/${{ github.repository_owner }}/${{ github.event.inputs.repo_name }}.git
+          git push -u origin master
