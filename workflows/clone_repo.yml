@@ -1,0 +1,18 @@
+# .github/workflows/clone-repo.yml
+name: Clonar repositorio
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo_url:
+        description: 'URL del repositorio a clonar'
+        required: true
+
+jobs:
+  clonar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
+        run: |
+          git clone ${{ github.event.inputs.repo_url }}
+          echo "Repositorio clonado exitosamente"
