@@ -1,0 +1,19 @@
+# .github/workflows/delete-repo.yml
+name: Eliminar repositorio
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo_name:
+        description: 'Nombre del repositorio a eliminar'
+        required: true
+
+jobs:
+  eliminar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Eliminar repo vía GitHub CLI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh repo delete ${{ github.repository_owner }}/${{ github.event.inputs.repo_name }} --confirm
